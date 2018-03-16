@@ -5,7 +5,8 @@ const
   bodyParser = require('body-parser'),
   mongoose = require('mongoose'),
   port = process.env.port || 3000,
-  Album = require('./models/Album.js')
+  Album = require('./models/Album.js'),
+  Artist = require('./models/Artist.js')
 
 mongoose.connect('mongodb://localhost/record-label', (err) => {
   console.log(err || "Connected to MongoDB.")
@@ -85,8 +86,18 @@ app.delete('/albums/:albumId/songs/:songId', (req, res) => {
 ///////////////////////////////////////////////
 
 // index all artists
+app.get('/artists', (req, res) => {
+  Artist.find({}, (err, allDemArtists) => {
+    res.json(allDemArtists)
+  })
+})
 
 // create an artist
+app.post('/artists', (req, res) => {
+  Artist.create(req.body, (err, brandNewArtist) => {
+    res.json({ success: true, message: "artist created.", artist: brandNewArtist})
+  })
+})
 
 // get a specific artist
 
