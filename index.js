@@ -65,7 +65,8 @@ app.post('/albums/:id/songs', (req, res) => {
 // get a specific song from a specific album
 app.get('/albums/:albumId/songs/:songId', (req, res) => {
   Album.findById(req.params.albumId, (err, thatAlbum) => {
-    res.json(thatAlbum.songs.id(req.params.songId))
+    const thatSong = thatAlbum.songs.id(req.params.songId)
+    res.json({song: thatSong, album: thatAlbum.title})
   })
 })
 
