@@ -4,7 +4,8 @@ const
   logger = require('morgan'),
   bodyParser = require('body-parser'),
   mongoose = require('mongoose'),
-  port = process.env.port || 3000
+  port = process.env.port || 3000,
+  Album = require('./models/Album.js')
 
 mongoose.connect('mongodb://localhost/record-label', (err) => {
   console.log(err || "Connected to MongoDB.")
@@ -23,10 +24,25 @@ app.get('/', (req, res) => {
 ///////////////////////////////////////////////
 
 // get all albums
+app.get('/albums', (req, res) => {
+  Album.find({}, (err, allDemAlbums) => {
+    res.json(allDemAlbums)
+  })
+})
 
 // post a new album
+app.post('/albums', (req, res) => {
+  Album.create(req.body, (err, brandNewAlbum) => {
+    res.json({ success: true, message: "Album created 🎺", album: brandNewAlbum })
+  })
+})
 
 // get a specific album
+app.get('/albums/:id', (req, res) => {
+  Album.findById(req.params.id, (err, thatAlbum) => {
+    res.json(thatAlbum)
+  })
+})
 
 // delete an album
 
@@ -37,11 +53,32 @@ app.get('/', (req, res) => {
 // get all songs in an album
 
 // post a new song to a specific album
+app.post('/albums/:id/songs', (req, res) => {
+  Album.findById(req.params.id, (err, thatAlbum) => {
+    thatAlbum.songs.push(req.body)
+    thatAlbum.save((err, savedAlbum) => {
+      res.json({ success: true, message: "Song added 🎷", album: savedAlbum })
+    })
+  })
+})
 
 // get a specific song from a specific album
+app.get('/albums/:albumId/songs/:songId', (req, res) => {
+  Album.findById(req.params.albumId, (err, thatAlbum) => {
+    res.json(thatAlbum.songs.id(req.params.songId))
+  })
+})
 
 // delete a song from an album
-
+app.delete('/albums/:albumId/songs/:songId', (req, res) => {
+  Album.findById(req.params.albumId, (err, thatAlbum) => {
+    // remove song from the album's songs array
+    thatAlbum.songs.id(req.params.songId).remove()
+    thatAlbum.save((err, savedAlbum) => {
+      res.json({ success: true, message: "Song deleted 🎸", album: savedAlbum })
+    })
+  })
+})
 
 // ARTIST ROUTES
 ///////////////////////////////////////////////
