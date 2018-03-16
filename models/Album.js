@@ -9,7 +9,7 @@ const
         releaseDate: Date,
         albumArt: String,
         songs: [songSchema],
-        artist: { type: mongoose.Schema.Types.objectId ref: 'Artist' }
+        artist: { type: mongoose.Schema.Types.ObjectId, ref: 'Artist' }
     }, { timestamps:true })
 
 const Album = mongoose.model('Album', albumSchema)

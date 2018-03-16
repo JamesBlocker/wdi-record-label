@@ -32,15 +32,16 @@ app.get('/albums', (req, res) => {
 })
 
 // post a new album
-app.post('/albums', (req, res) => {
-  Album.create(req.body, (err, brandNewAlbum) => {
-    res.json({ success: true, message: "Album created 🎺", album: brandNewAlbum })
-  })
-})
+// app.post('/albums', (req, res) => {
+//   Album.create(req.body, (err, brandNewAlbum) => {
+//     res.json({ success: true, message: "Album created 🎺", album: brandNewAlbum })
+//   })
+// })
 
 // get a specific album
 app.get('/albums/:id', (req, res) => {
-  Album.findById(req.params.id, (err, thatAlbum) => {
+  // Album.findById(req.params.id, (err, thatAlbum) => {
+    Album.findById(req.params.id).populate('artist').exec((err, thatAlbum) => {
     res.json(thatAlbum)
   })
 })
@@ -102,9 +103,24 @@ app.post('/artists', (req, res) => {
 // get a specific artist
 
 // create an album belonging to a specific artist
+app.post('/artists/:id/albums', (req, res) => {
+  const newAlbum = new Album(req.body)
+  newAlbum.artist = req.params.id
+  newAlbum.save((err, brandNewAlbum) => {
+    res.json({ success: true, message: "album created", album: brandNewAlbum })
+  })
+})
 
 // delete an artist and all of their albums
+app.delete('/artists/:id', (req, res) => {
+  Artist.findByIdAndRemove(req.params.id, (err, deletedArtist) => {
+    Album.remove({ artist: req.params.id }, (err) => {
+      res.json({success: true, message: "artist and albums deleted"})
+    })
+  })
+})
 
+// port
 app.listen(port, (err) => {
   console.log(err || `Server running on ${port}`)
 })
